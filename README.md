@@ -64,11 +64,11 @@ KNN_Regressor
 
 **get_Fitted_Models**(self,verbose = True)
 
-retorna uma lista com os modelos já treinados da instância
+* retorna uma lista com os modelos já treinados da instância
 
 **fit_models**(self, modelsList=False, path="modelosTreinados")
 
-funcao para treinar os modelos
+* funcao para treinar os modelos
 
 modelList
 
