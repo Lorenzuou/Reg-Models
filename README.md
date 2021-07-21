@@ -72,31 +72,31 @@ funcao para treinar os modelos
 
 modelList
 
-padrão = False, o programa uma lista arbitrária com todos os modelos do código 
+* padrão = False, o programa uma lista arbitrária com todos os modelos do código 
 
-É um dicionário no formato {'Nome do modelo 1' : 15, 'Nome do modelo 2' : 15} 
+* É um dicionário no formato {'Nome do modelo 1' : 15, 'Nome do modelo 2' : 15} 
 
-A key é o nome do modelo (tem que ser igual ao que estiver na lista de **getStandardModels** )  e o valor é a quantidade de tentativas (trials) que o modelo vai ser executado no optuna com parâmetros diferentes. (número maior de tentativas = maior tempo de execução) 
+* A key é o nome do modelo (tem que ser igual ao que estiver na lista de **getStandardModels** )  e o valor é a quantidade de tentativas (trials) que o modelo vai ser executado no optuna com parâmetros diferentes. (número maior de tentativas = maior tempo de execução) 
 
-path 
+**path** 
 
-caminho de diretório aonde os modelos serão salvos em arquivos .sav 
+* caminho de diretório aonde os modelos serão salvos em arquivos .sav 
 
-pré-condição: caminho deve existir 
+* pré-condição: caminho deve existir 
 
 **stack_models**(self)
 
-Quando chamada, a funcao irá utilizar a lista de funções especificadas pelo usuário anteriormente em **fit_models() para aplicar o ensemble (utilizando o StackingRegressor do sklearn)** no objetivo de atingir uma previsão que considere mais de um modelo de regressão.  
+* Quando chamada, a funcao irá utilizar a lista de funções especificadas pelo usuário anteriormente em **fit_models() para aplicar o ensemble (utilizando o StackingRegressor do sklearn)** no objetivo de atingir uma previsão que considere mais de um modelo de regressão.  
 
 **get_Stacked_Model**(self)
 
-Retorna, se, e somente se, **stack_models()** foi utilizado anteriormente, o modelo *sklearn* criado pelo método de Stacking 
+* Retorna, se, e somente se, **stack_models()** foi utilizado anteriormente, o modelo *sklearn* criado pelo método de Stacking 
 
 **models_performace(self)**
 
-Retorna um *DataFrame* do módulo *pandas* com a avaliação das métricas: R2, MAE e RMSE respectivo dos desempenhos de cada modelo treinado
+* Retorna um *DataFrame* do módulo *pandas* com a avaliação das métricas: R2, MAE e RMSE respectivo dos desempenhos de cada modelo treinado
 
-Exemplo: 
+* Exemplo: 
 
 ```python
 a = RegModels(modo="load", X_trainS=X_train,
