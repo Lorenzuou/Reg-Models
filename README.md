@@ -5,6 +5,7 @@ Este guia foi escrito no intuito auxiliar o usuário na utilização do código 
 ## Introdução
 
 O código desenvolvido possui uma classe chamada  **IrregModels.**  
+Espera-se que o usuário já tenha preparado os dados de treino e teste para utilizar a classe.
 
 Sua instanciação é feita da seguinte forma 
 
