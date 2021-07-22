@@ -2,7 +2,7 @@
 
 Este guia foi escrito no intuito auxiliar o usuário na utilização do código que gera uma classe em python para facilitar o uso e otimização de modelos de Machine Learning de Regressão. 
 
-## Introdução
+### Introdução
 
 O código desenvolvido possui uma classe chamada  **IrregModels.**  
 Espera-se que o usuário já tenha preparado os dados de treino e teste para utilizar a classe.
@@ -17,6 +17,10 @@ obj = IrregModels(X_train = X_train,
 ```
 
 Sendo os parâmetros os dados de treino e teste a serem utilizados no modelo
+
+### Uso
+
+Baixe esse repositório e importe: "from diretorio.Reg_Models import RegModels
 
 ### Atributos
 
