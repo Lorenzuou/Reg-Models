@@ -1,6 +1,8 @@
 # Guia Classe de otimização com Optuna
 
 Este guia foi escrito no intuito auxiliar o usuário na utilização do código que gera uma classe em python para facilitar o uso e otimização de modelos de Machine Learning de Regressão. 
+Entre as utilidades estã a otimização de modelos e o armazenamento deles. O ensemble de modelos de regressão e a comparação de resultados entre eles. 
+Além disso, adicionar e editar as funções de otimização de cada modelo é simples. 
 
 ### Introdução
 
