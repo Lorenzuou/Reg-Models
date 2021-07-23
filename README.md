@@ -14,7 +14,7 @@ Sua instanciação é feita da seguinte forma
  **
 
 ```python
-obj = IrregModels(X_train = X_train, 
+obj = RegModels(X_train = X_train, 
 	X_test = X_test, y_train = y_train, y_test = y_test)
 ```
 
@@ -47,7 +47,7 @@ get_Standard_Models(self, verbose = True)
 Retorna a lista com todos os modelos disponiveis para consulta do usuário no formato: {'nome do modelo',modelo} 
 
 ```python
-a = IrregModels(modo="optimize", X_trainS=X_train,
+a = RegModels(modo="optimize", X_trainS=X_train,
                 X_testS=X_test, y_trainS=y_train, y_testS=y_test, path="fitted_models")
 
 a.getStandardModels(verbose=True)
