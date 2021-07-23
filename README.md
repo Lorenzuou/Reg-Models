@@ -48,7 +48,7 @@ Retorna a lista com todos os modelos disponiveis para consulta do usuário no fo
 
 ```python
 a = IrregModels(modo="optimize", X_trainS=X_train,
-                X_testS=X_test, y_trainS=y_train, y_testS=y_test)
+                X_testS=X_test, y_trainS=y_train, y_testS=y_test, path="fitted_models")
 
 a.getStandardModels(verbose=True)
 ```
