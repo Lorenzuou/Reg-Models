@@ -115,11 +115,12 @@ class RegModels:
                 print("\n\nModel concluded:  {} saved as '{}' \n ".format(
                     self.models_fit[k][1], m + ".sav"))
                 k += 1
-                tqdm(iteration, total=qtd,
-                     desc="Text You Want")
-            else:
-                import os
-                savedModels = os.listdir(self.path)
+                # tqdm(iteration, total=qtd,
+
+                #      desc="Text You Want")
+        else:
+            import os
+            savedModels = os.listdir(self.path)
 
             for m in modelsList:
                 for e in savedModels:
@@ -309,13 +310,22 @@ def obj_lasso(trial):
 
 
 def obj_random_forest(trial):
-    h_n_estimators = trial.suggest_int("n_estimators", 100, 500)  # descrição
-    h_max_depth = trial.suggest_categorical(
-        "max_depth", [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None])  # descrição
-    h_min_samples_leaf = trial.suggest_categorical("leaf", [1, 2, 4])
-    h_min_samples_split = trial.suggest_categorical(
+    f_n_estimators = trial.suggest_int("n_estimators", 100, 500)  # descrição
+
+    f_min_samples_leaf = trial.suggest_categorical("leaf", [1, 2, 4])
+    f_min_samples_split = trial.suggest_categorical(
         "samples_split", [2, 5, 10])
-    model = ensemble.RandomForestRegressor()
+    int_max_features = np.linspace(len(X_train.columns),10,5,dtype=int) 
+    
+    max_features_list = ["auto","sqrt","log2",None] 
+
+
+    for e in int_max_features: 
+        max_features_list.append(int(e))
+
+
+    f_max_features = trial.suggest_categorical("max_features",max_features_list )
+    model = ensemble.RandomForestRegressor(n_estimators = f_n_estimators, min_samples_split = f_min_samples_split, min_samples_leaf = f_min_samples_leaf, max_features = f_max_features, n_jobs = -1)
     trial.set_user_attr(key="best_model", value=model)
 
     return score_method(model, trial)
