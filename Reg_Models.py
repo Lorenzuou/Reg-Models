@@ -364,20 +364,27 @@ def obj_ridge(trial):
 
 
 def obj_XGBRegressor(trial):
-    model = xgboost.XGBRegressor(objective='reg:squarederror')
+    x_max_deph = trial.suggest_int("max_depth",3,10)
+    x_learning_rate = trial.suggest_float("learning_rate",0.01,0.1)
+    x_n_estimators = trial.suggest_int("n_estimators",100,1000)
+    x_colsample_bytree = trial.suggest_float("bytree",0.1,0.9)
+    model = xgboost.XGBRegressor(max_deph = x_max_deph,learning_rate = x_learning_rate, n_estimators = x_n_estimators, colsample_bytree = x_colsample_bytree  )
     trial.set_user_attr(key="best_model", value=model)
 
     return score_method(model, trial)
 
 
 def obj_extra_trees(trial):
-    h_n_estimators = trial.suggest_int("n_estimators", 10, 100)  # descrição
-    h_random_state = trial.suggest_int("random_state", 1, 50)
-    h_min_samples_split = trial.suggest_int("min_samples_split", 2, 5)
-    h_min_samples_leaf = trial.suggest_int("min_samples_leaf", 1, 5)
-    model = ensemble.ExtraTreesRegressor(min_samples_leaf=h_min_samples_leaf,
-                                         min_samples_split=h_min_samples_split, n_estimators=h_n_estimators, random_state=h_random_state)
-    trial.set_user_attr(key="best_model", value=model)
+    e_n_estimators = trial.suggest_int("n_estimators", 10, 100)  # descrição
+    e_random_state = trial.suggest_int("random_state", 1, 50)
+    e_min_samples_split = trial.suggest_int("min_samples_split", 2, 5)
+    e_min_samples_leaf = trial.suggest_int("min_samples_leaf", 1, 5)
+    e_oob_score = trial.suggest_categorical("oob_score",[True,False])
+    e_bootstrap = e_oob_score if False else True
+    
+    model = ensemble.ExtraTreesRegressor(oob_score = e_oob_score, min_samples_leaf=e_min_samples_leaf,
+                                         min_samples_split=e_min_samples_split, n_estimators=e_n_estimators, random_state=e_random_state, bootstrap = e_bootstrap)
+    trial.set_user_attr(key="best_model", value=model )
 
     return score_method(model, trial)
 
