@@ -46,7 +46,8 @@ class RegModels:
                                 'Cat_Boost': obj_catBoostRegressor,
                                 'Light_Boost': obj_LightBoost,
                                 'KNN_Regressor': obj_KNeighborsRegressor,
-                                'Ridge_CV': obj_ridge_CV}
+                                'Ridge_CV': obj_ridge_CV,
+                                'SGD_Reg':obj_SGDRegressor}
 
     # Retorna a lista de modelos dispomíveis
     # verbose == True, a funcao printa o nome dos modelos
@@ -106,7 +107,7 @@ class RegModels:
             iteration = 0
             for m in modelsList:
                 model = self.standard_models[m]
-                print('Otimizando modelo', m)
+                print('Optimizing model', m)
                 best_model, study = set_model(model, modelsList[m])
                 iteration += modelsList[m]
                 self.models_fit.append((m, best_model))
@@ -121,6 +122,7 @@ class RegModels:
         else:
             import os
             savedModels = os.listdir(self.path)
+            self.models_fit = []  
 
             for m in modelsList:
                 for e in savedModels:
@@ -301,6 +303,7 @@ def obj_ridge_CV(trial):
 
 def obj_lasso(trial):
     h_alpha = trial.suggest_float("alpha", 0.1, 1.0)
+
     model = linear_model.Lasso(alpha=h_alpha)
     trial.set_user_attr(key="best_model", value=model)
 
@@ -311,7 +314,7 @@ def obj_lasso(trial):
 
 def obj_random_forest(trial):
     f_n_estimators = trial.suggest_int("n_estimators", 100, 500)  # descrição
-
+    f_max_depth = trial.suggest_int("max_depth",10,50)
     f_min_samples_leaf = trial.suggest_categorical("leaf", [1, 2, 4])
     f_min_samples_split = trial.suggest_categorical(
         "samples_split", [2, 5, 10])
@@ -325,18 +328,20 @@ def obj_random_forest(trial):
 
 
     f_max_features = trial.suggest_categorical("max_features",max_features_list )
-    model = ensemble.RandomForestRegressor(n_estimators = f_n_estimators, min_samples_split = f_min_samples_split, min_samples_leaf = f_min_samples_leaf, max_features = f_max_features, n_jobs = -1)
+    model = ensemble.RandomForestRegressor(max_depth =f_max_depth, n_estimators = f_n_estimators, min_samples_split = f_min_samples_split, min_samples_leaf = f_min_samples_leaf, max_features = f_max_features, n_jobs = -1)
     trial.set_user_attr(key="best_model", value=model)
 
     return score_method(model, trial)
 
 
 def obj_elastic_net(trial):
-    h_n_alphas = trial.suggest_int("n_alphas", 10, 1000)
-    h_random_state = trial.suggest_int("random_state", 1, 50)
-    h_cv = trial.suggest_int("cv", 3, 5)
-    model = linear_model.ElasticNetCV(
-        n_alphas=h_n_alphas,  cv=h_cv, random_state=h_random_state)
+    e_alpha = trial.suggest_float("alpha",0.1,1)
+    # e_random_state = trial.suggest_int("random_state", 1, 50)
+    # e_max_iter = trial.suggest_int("max_iter",100,10000)
+    e_l1_ratio = trial.suggest_float("l1_ratio",0.1,1)
+    # e_cv = trial.suggest_int("cv", 3, 5)
+    model = linear_model.ElasticNet(
+       alpha=e_alpha,l1_ratio = e_l1_ratio )
     trial.set_user_attr(key="best_model", value=model)
 
     return score_method(model, trial)
@@ -356,7 +361,7 @@ def obj_ada_boost(trial):
 
 
 def obj_ridge(trial):
-    h_alpha = trial.suggest_float("alpha", 0.01, 1.0)
+    h_alpha = trial.suggest_float("alpha",0.1, 500)
     model = linear_model.Ridge(alpha=h_alpha)
     trial.set_user_attr(key="best_model", value=model)
 
@@ -368,7 +373,8 @@ def obj_XGBRegressor(trial):
     x_learning_rate = trial.suggest_float("learning_rate",0.01,0.1)
     x_n_estimators = trial.suggest_int("n_estimators",100,1000)
     x_colsample_bytree = trial.suggest_float("bytree",0.1,0.9)
-    model = xgboost.XGBRegressor(max_deph = x_max_deph,learning_rate = x_learning_rate, n_estimators = x_n_estimators, colsample_bytree = x_colsample_bytree  )
+    x_min_child_weight =  trial.suggest_int("min_child_weight",4,9)
+    model = xgboost.XGBRegressor(max_deph = x_max_deph,learning_rate = x_learning_rate, n_estimators = x_n_estimators, colsample_bytree = x_colsample_bytree, min_child_weight  =x_min_child_weight   )
     trial.set_user_attr(key="best_model", value=model)
 
     return score_method(model, trial)
@@ -380,7 +386,7 @@ def obj_extra_trees(trial):
     e_min_samples_split = trial.suggest_int("min_samples_split", 2, 5)
     e_min_samples_leaf = trial.suggest_int("min_samples_leaf", 1, 5)
     e_oob_score = trial.suggest_categorical("oob_score",[True,False])
-    e_bootstrap = e_oob_score if False else True
+    e_bootstrap = e_oob_score if False else True # necessary for the model to work 
     
     model = ensemble.ExtraTreesRegressor(oob_score = e_oob_score, min_samples_leaf=e_min_samples_leaf,
                                          min_samples_split=e_min_samples_split, n_estimators=e_n_estimators, random_state=e_random_state, bootstrap = e_bootstrap)
@@ -402,18 +408,20 @@ def obj_SGDRegressor(trial):
         "sdg_loss", ['squared_loss', 'huber', 'epsilon_insensitive'])
     sdg_penalty = trial.suggest_categorical(
         "penalty", ['l1', 'l2', 'elasticnet'])
+    sdg_alpha = trial.suggest_float('alpha',0.0001,1)
     model = linear_model.SGDRegressor(
-        verbose=1, penalty=sdg_penalty, loss=sdg_loss)
+        verbose=0, penalty=sdg_penalty, loss=sdg_loss, alpha=sdg_alpha)
     trial.set_user_attr(key="best_model", value=model)
 
     return score_method(model, trial)
 
 
 def obj_catBoostRegressor(trial):
-    cat_n_estimators = trial.suggest_int("n_estimators", 800, 1000)
-
+    cat_n_estimators = trial.suggest_int("n_estimators", 800, 2000)
+    cat_depth = trial.suggest_int("depth",8,12)
     model = CatBoostRegressor(
-        n_estimators=cat_n_estimators,
+         n_estimators=cat_n_estimators,
+        depth=10,
         verbose=False
     )
     trial.set_user_attr(key="best_model", value=model)
