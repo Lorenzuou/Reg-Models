@@ -4,8 +4,11 @@ Este guia foi escrito no intuito auxiliar o usuário na utilização do código 
 Entre as utilidades estã a otimização de modelos e o armazenamento deles. O ensemble de modelos de regressão e a comparação de resultados entre eles. 
 Além disso, adicionar e editar as funções de otimização de cada modelo é simples. 
 
+<<<<<<< HEAD
 Por padrão, há alguns parâmetros de otimização no código das funções dos modelos. No entanto, espera-se que o usuário os edite da forma adequada para seus processos específicos. 
 
+=======
+>>>>>>> origin/main
 ### Introdução
 
 O código desenvolvido possui uma classe chamada  **IrregModels.**  
@@ -75,11 +78,19 @@ KNN_Regressor
 
 * retorna uma lista com os modelos já treinados da instância
 
+<<<<<<< HEAD
 **fit_models**(self, modelsList=False, path="modelosTreinados", verbose = True)
 
 * funcao para treinar os modelos
 
 **modelList**
+=======
+**fit_models**(self, modelsList=False, path="modelosTreinados")
+
+* funcao para treinar os modelos
+
+modelList
+>>>>>>> origin/main
 
 * padrão = False, o programa uma lista arbitrária com todos os modelos do código 
 
@@ -93,6 +104,7 @@ KNN_Regressor
 
 * pré-condição: caminho deve existir 
 
+<<<<<<< HEAD
 **verbose**
 * padrão = True, exibe os logs do optuna
 
@@ -115,6 +127,16 @@ KNN_Regressor
 * Otimiza o modelo de regressao que sera utilizado para fazer o stcking
 * n_trials: Número de trials para otimização
 * model: Se não especificado, utiliza o modelo de regressao ridgeCV. 
+=======
+**stack_models**(self)
+
+* Quando chamada, a funcao irá utilizar a lista de funções especificadas pelo usuário anteriormente em **fit_models() para aplicar o ensemble (utilizando o StackingRegressor do sklearn)** no objetivo de atingir uma previsão que considere mais de um modelo de regressão.  
+
+**get_Stacked_Model**(self)
+
+* Retorna, se, e somente se, **stack_models()** foi utilizado anteriormente, o modelo *sklearn* criado pelo método de Stacking 
+
+>>>>>>> origin/main
 **models_performace(self)**
 
 * Retorna um *DataFrame* do módulo *pandas* com a avaliação das métricas: R2, MAE e RMSE respectivo dos desempenhos de cada modelo treinado
@@ -138,6 +160,7 @@ Ridge.sav        1.822004  4.025883  2.518531  0.628823
 Elastic_Net.sav  1.821933  4.033852  2.519516  0.628532
 ```
 
+<<<<<<< HEAD
 
 **visualize_slice(self, model_name, param_list=False)**
 
@@ -148,6 +171,8 @@ Elastic_Net.sav  1.821933  4.033852  2.519516  0.628532
 
 
 
+=======
+>>>>>>> origin/main
 ### Modelos
 
 ### Definindo hiperparâmetros

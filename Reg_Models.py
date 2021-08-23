@@ -196,15 +196,22 @@ class RegModels:
 
     # retorna uma tabela com a performace de todos os modelos
 
-    def models_performace(self):
+    def models_performace(self, modelsList = False):
 
         test_metrics = []
         scoreList = []
         if(self.modo == "optimize"):
             for m in self.models_fit:
-                test_pred = m[1].predict(X_test)
-                scoreList.append(m[1].score(X_test, y_test))
-                test_metrics.append(calculate_metrics(y_test, test_pred, m[0]))
+                if(modelsList == False):
+                    test_pred = m[1].predict(X_test)
+                    scoreList.append(m[1].score(X_test, y_test))
+                    test_metrics.append(calculate_metrics(y_test, test_pred, m[0]))
+                else: 
+                    if(m[0] in modelsList): 
+                        test_pred = m[1].predict(X_test)
+                        scoreList.append(m[1].score(X_test, y_test))
+                        test_metrics.append(calculate_metrics(y_test, test_pred, m[0]))
+                    
         else:
             import os
 
@@ -215,13 +222,21 @@ class RegModels:
                 return False
 
             for m in savedModels:
-                model = load_model(m, self.path)
-                test_pred = model.predict(X_test)
-                scoreList.append(model.score(X_test, y_test))
-                test_metrics.append(calculate_metrics(y_test, test_pred, m))
+                if(modelsList == False):
+                    model = load_model(m, self.path)
+                    test_pred = model.predict(X_test)
+                    scoreList.append(model.score(X_test, y_test))
+                    test_metrics.append(calculate_metrics(y_test, test_pred, m))
+                else:
+                     if(m in modelsList): 
+                        test_pred = model.predict(X_test)
+                        scoreList.append(model.score(X_test, y_test))
+                        test_metrics.append(calculate_metrics(y_test, test_pred, m))
 
-        data = pd.concat(test_metrics)
-        data['R2'] = scoreList
+        data = False 
+        if(test_metrics):
+            data = pd.concat(test_metrics)
+            data['R2'] = scoreList
         return data
 
     def stack_model_tune(self, n_trials, model=False):
