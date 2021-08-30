@@ -22,7 +22,7 @@ class RegModels:
         self.X_test = X_testS
         self.y_test = y_testS
         self.stack_model = RidgeCV()
-        
+        self.study_list = {}
         global X_train
         X_train = self.X_train
         global y_train
@@ -79,7 +79,7 @@ class RegModels:
             self.optimize_models(opt=False)
       
 
-    def optimize_models(self, opt):
+    def optimize_models(self, opt, continuation_studies = False):
 
         if self.modelsList:
             modelsList = self.modelsList  # lista de modelos definidas pelo usuario
@@ -98,16 +98,16 @@ class RegModels:
         k = 0
         if(opt):
             self.models_fit = []  # cria um dict para armazenar os modelos treinados pelo optuna
-            self.study_list = {}
-            qtd = 0
-            for m in modelsList:
-                qtd = qtd + modelsList[m]
-            iteration = 0
+            
+            # qtd = 0
+            # for m in modelsList:
+            #     qtd = qtd + modelsList[m]
+         
             for m in tqdm(modelsList):
                 model = self.standard_models[m]
                 print('Optimizing model', m)
-                best_model, study = set_model(model, modelsList[m])
-                iteration += modelsList[m]
+                best_model, study = set_model(model, modelsList[m],model_name=m)
+              
                 self.models_fit.append((m, best_model))
                 save_model(self.models_fit[k][1], (m + ".sav"), path=self.path)
                 self.study_list[m] = study
@@ -244,17 +244,59 @@ class RegModels:
             final = set_model(self.standard_models[model], n_trials)
         self.stack_model = final
         return final
+    
+    def continue_optimization(self, modelsList):
+        import os
+
+       
+        savedStudies = os.listdir("studies")
+        self.models_fit = []
+        k = 0
+        for e in savedStudies:
+            for m in modelsList: 
+                if (e==m + ".pkl"): 
+                    model = self.standard_models[m]
+                    print('Optimizing model', m)
+                    best_model, study = set_model(model, modelsList[m], studyC = resume_study("studies",e), model_name=m)
+                
+                    self.models_fit.append((m, best_model))
+                    save_model(self.models_fit[k][1], (m + ".sav"), path=self.path)
+                    self.study_list[m] = study
+                    print("\n\nModel concluded:  {} saved as '{}' \n ".format(
+                    self.models_fit[k][1], m + ".sav"))
+                    k = k + 1; 
+                    
+                 
+
+
+
+
 
 ########################################
     
-def set_model(model, n_trials):
-    study = optuna.create_study(direction="maximize")
+def set_model(model, n_trials, studyC = False, model_name="standard"):
+    if(studyC == False) :
+        study = optuna.create_study(direction="maximize",study_name=model_name)
+    else: 
+        study = studyC
     study.optimize(model, n_trials=n_trials, callbacks=[callback])
+    save_study(study, (model_name+".pkl"))
     print(study.best_trial)
     best_model = study.user_attrs["best_model"]
 
     return best_model,study
 
+
+  
+def resume_study(path,name): 
+    import pickle
+    filename = path + '/' + name
+    return pickle.load(open(filename, 'rb'))
+
+def save_study(study,name,path="studies"): 
+    import pickle
+    filename = path + '/' + name
+    pickle.dump(study, open(filename, 'wb'))
 
 def save_model(model, name, path):
     import pickle
@@ -307,8 +349,8 @@ def obj_ridge(trial):
 
 
 def obj_elastic_net(trial):
-    e_alpha = trial.suggest_int("n_alphas", 1, 100, log=True)
-    e_l1_ratio = trial.suggest_float("l1_ratio",0.1,1)
+    e_alpha = trial.suggest_categorical("alpha", [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 0.0, 1.0, 10.0, 100.0])
+    e_l1_ratio = trial.suggest_loguniform("l1_ratio", 0.1,1)
     model = linear_model.ElasticNet(alpha=e_alpha,l1_ratio = e_l1_ratio)
     
     trial.set_user_attr(key="best_model", value=model)
@@ -318,21 +360,21 @@ def obj_elastic_net(trial):
 
 def obj_random_forest(trial):
     f_n_estimators = trial.suggest_int("n_estimators", low=20,high=200,step=10)
-    f_max_depth = trial.suggest_int("max_depth", low=2,high=30,step=2)
+    f_max_depth = trial.suggest_int("max_depth", low=2,high=50,step=2)
     f_min_samples_leaf = trial.suggest_int("min_samples_leaf", low=1, high=8, step=1)
     f_min_samples_split = trial.suggest_int("min_samples_split", low=2, high=8, step=1)
     
-    #int_max_features = np.arange(24,len(X_train.columns),1,dtype=int) 
-    #max_features_list = []
-    #for e in int_max_features: 
-    #    max_features_list.append(int(e))
-    #f_max_features = trial.suggest_categorical("max_features",max_features_list) 
+    int_max_features = np.arange(24,len(X_train.columns),1,dtype=int) 
+    max_features_list = []
+    for e in int_max_features: 
+       max_features_list.append(int(e))
+    f_max_features = trial.suggest_categorical("max_features",max_features_list) 
      
     model = ensemble.RandomForestRegressor(max_depth=f_max_depth,
                                            n_estimators = f_n_estimators,
                                            min_samples_split = f_min_samples_split,
                                            min_samples_leaf = f_min_samples_leaf,
-                                           #max_features = f_max_features,
+                                           max_features = f_max_features,
                                            random_state=0, 
                                            n_jobs = -1)
 
